@@ -1,5 +1,4 @@
 import threading
-import time
 from settings import load_settings
 from components.button import run_button
 from components.pir import run_pir
@@ -7,9 +6,6 @@ from components.ultrasonic import run_ultrasonic
 from components.membrane import run_membrane
 from actuators.led import led_on, led_off
 from actuators.buzzer import buzzer_on, buzzer_off
-
-
-
 
 def console_menu():
     print("\n=== ACTUATOR CONTROL ===")
@@ -19,15 +15,11 @@ def console_menu():
     print("4 - BUZZER OFF")
     print("q - Quit")
 
-
-
-
 if __name__ == "__main__":
     print("Starting KT1 Smart Door Simulation")
     settings = load_settings()
     threads = []
     stop_event = threading.Event()
-
 
     try:
         run_button(settings['DS1'], threads, stop_event)
@@ -35,11 +27,9 @@ if __name__ == "__main__":
         run_ultrasonic(settings['DUS1'], threads, stop_event)
         run_membrane(settings['DMS'], threads, stop_event)
 
-
         while True:
             console_menu()
             cmd = input("> ")
-
 
             if cmd == "1":
                 led_on()
@@ -51,7 +41,6 @@ if __name__ == "__main__":
                 buzzer_off()
             elif cmd.lower() == "q":
                 break
-
 
     except KeyboardInterrupt:
         pass
