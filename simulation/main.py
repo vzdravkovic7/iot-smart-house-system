@@ -23,9 +23,9 @@ if __name__ == "__main__":
 
     try:
         run_button(settings['DS1'], threads, stop_event)
-        run_pir(settings['DPIR1'], threads, stop_event)
-        run_ultrasonic(settings['DUS1'], threads, stop_event)
-        run_membrane(settings['DMS'], threads, stop_event)
+        # run_pir(settings['DPIR1'], threads, stop_event)
+        # run_ultrasonic(settings['DUS1'], threads, stop_event)
+        # run_membrane(settings['DMS'], threads, stop_event)
 
         while True:
             console_menu()

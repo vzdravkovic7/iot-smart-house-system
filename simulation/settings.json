@@ -1,7 +1,9 @@
 {
     "DS1": {
+        "name": "Door Sensor 1",
+        "runs_on": "PI1",
         "simulated": true,
-        "pin": 17
+        "topic": "sensors/button"
     },
     "DPIR1": {
         "simulated": true,
