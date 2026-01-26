@@ -16,7 +16,7 @@ def console_menu():
     print("q - Quit")
 
 if __name__ == "__main__":
-    print("Starting KT1 Smart Door Simulation")
+    print("Starting KT2 Smart Door Simulation")
     settings = load_settings()
     threads = []
     stop_event = threading.Event()
@@ -32,13 +32,13 @@ if __name__ == "__main__":
             cmd = input("> ")
 
             if cmd == "1":
-                led_on()
+                led_on(settings['DL'])
             elif cmd == "2":
-                led_off()
+                led_off(settings['DL'])
             elif cmd == "3":
-                buzzer_on()
+                buzzer_on(settings['DB'])
             elif cmd == "4":
-                buzzer_off()
+                buzzer_off(settings['DB'])
             elif cmd.lower() == "q":
                 break
 
