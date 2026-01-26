@@ -6,15 +6,33 @@
         "topic": "sensors/button"
     },
     "DPIR1": {
+        "name": "Door Motion Sensor 1",
+        "runs_on": "PI1",
         "simulated": true,
-        "pin": 27
+        "topic": "sensors/pir"
     },
     "DUS1": {
+        "name": "Door Ultrasonic Sensor 1",
+        "runs_on": "PI1",
         "simulated": true,
-        "trigger_pin": 5,
-        "echo_pin": 6
+        "topic": "sensors/ultrasonic"
     },
     "DMS": {
-        "simulated": true
+        "name": "Door Membrane Switch 1",
+        "runs_on": "PI1",
+        "simulated": true,
+        "topic": "sensors/membrane"
+    },
+    "DB": {
+        "name": "Door Buzzer 1",
+        "runs_on": "PI1",
+        "simulated": true,
+        "topic": "actuators/buzzer"
+    },
+    "DL": {
+        "name": "Door Light 1",
+        "runs_on": "PI1",
+        "simulated": true,
+        "topic": "actuators/led"
     }
 }
