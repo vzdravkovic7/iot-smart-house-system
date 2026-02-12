@@ -10,18 +10,19 @@ publish_data_limit = 5
 counter_lock = threading.Lock()
 
 def publisher_task(event, batch):
-    global publish_data_counter, publish_data_limit
+    global publish_data_counter
     while True:
         event.wait()
         with counter_lock:
             local_batch = batch.copy()
-            publish_data_counter = 0
             batch.clear()
+            publish_data_counter = 0
         publish.multiple(local_batch, hostname=HOSTNAME, port=PORT)
         event.clear()
 
 publish_event = threading.Event()
-publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, batch,))
+
+publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, batch))
 publisher_thread.daemon = True
 publisher_thread.start()
 
@@ -31,16 +32,16 @@ def pir_callback(motion, settings, publish_event):
 
     payload = {
         "measurement": settings['measurement'],
-        "simulated": settings['simulated'],
+        "simulated": settings["simulated"],
         "runs_on": settings["runs_on"],
         "name": settings["name"],
         "value": 1 if motion else 0
     }
 
     with counter_lock:
-        batch.append((settings['measurement'], json.dumps(payload), 0, True))
+        batch.append((settings["measurement"], json.dumps(payload), 0, True))
         publish_data_counter += 1
-    
+
     if publish_data_counter >= publish_data_limit:
         publish_event.set()
 

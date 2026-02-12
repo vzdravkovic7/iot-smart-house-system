@@ -23,9 +23,16 @@ mqtt_client.loop_start()
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe("Button"),
+    client.subscribe("DS2"),
+    client.subscribe("BTN"),
     client.subscribe("PIR"),
+    client.subscribe("PIR2"),
     client.subscribe("Ultrasonic"),
+    client.subscribe("Ultrasonic2"),
     client.subscribe("Membrane"),
+    client.subscribe("DHT3"),
+    client.subscribe("GSG"),
+    client.subscribe("WEBC"),
     client.subscribe("DL"),
     client.subscribe("DB"),
     client.subscribe("DHT1"),
@@ -33,6 +40,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("IR"),
     client.subscribe("LCD"),
     client.subscribe("DPIR3")
+    client.subscribe("4SD")
 
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = lambda client, userdata, msg: save_to_db(json.loads(msg.payload.decode('utf-8')))

@@ -1,13 +1,16 @@
 import threading
 from settings import load_settings
-from components.button import run_button
+from components.generic_button import run_generic_button
 from components.pir import run_pir
 from components.ultrasonic import run_ultrasonic
 from components.membrane import run_membrane
 from components.dht import run_dht
 from components.ir import run_ir
+from components.gyro import run_gyro
 from actuators.led import led_on, led_off
 from actuators.buzzer import buzzer_on, buzzer_off
+from actuators.timer4sd import timer_set, timer_clear
+from components.web_camera import run_web_camera
 
 def console_menu():
     print("\n=== ACTUATOR CONTROL ===")
@@ -15,6 +18,8 @@ def console_menu():
     print("2 - LED OFF")
     print("3 - BUZZER ON")
     print("4 - BUZZER OFF")
+    print("5 - SET TIMER VALUE")
+    print("6 - CLEAR TIMER")
     print("q - Quit")
 
 if __name__ == "__main__":
@@ -24,17 +29,23 @@ if __name__ == "__main__":
     stop_event = threading.Event()
 
     try:
-        # run_button(settings['DS1'], threads, stop_event)
-        # run_pir(settings['DPIR1'], threads, stop_event)
-        # run_ultrasonic(settings['DUS1'], threads, stop_event)
-        # run_membrane(settings['DMS'], threads, stop_event)
-
         # run_dht(settings['DHT1'], threads, stop_event)
         # run_dht(settings['DHT2'], threads, stop_event)
         # run_ir(settings['IR'], threads, stop_event)
         # run_ir(settings['LCD'], threads, stop_event)
         # run_pir(settings['DPIR3'], threads, stop_event)
 
+        run_generic_button(settings['DS1'], threads, stop_event)
+        run_generic_button(settings['DS2'], threads, stop_event)
+        run_generic_button(settings['BTN'], threads, stop_event)
+        run_pir(settings['DPIR1'], threads, stop_event)
+        run_pir(settings["DPIR2"], threads, stop_event)
+        run_ultrasonic(settings['DUS1'], threads, stop_event)
+        run_ultrasonic(settings["DUS2"], threads, stop_event)
+        run_membrane(settings['DMS'], threads, stop_event)
+        run_dht(settings["DHT3"], threads, stop_event)
+        run_gyro(settings["GSG"], threads, stop_event)
+        run_web_camera(settings["WEBC"], threads, stop_event)
 
         while True:
             console_menu()
@@ -48,6 +59,11 @@ if __name__ == "__main__":
                 buzzer_on(settings['DB'])
             elif cmd == "4":
                 buzzer_off(settings['DB'])
+            elif cmd == "5":
+                value = int(input("Enter timer value: "))
+                timer_set(settings['4SD'], value)
+            elif cmd == "6":
+                timer_clear(settings['4SD'])
             elif cmd.lower() == "q":
                 break
 

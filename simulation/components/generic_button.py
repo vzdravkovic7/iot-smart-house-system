@@ -1,17 +1,17 @@
 from simulators.button import run_button_simulator
 import threading
-import time
 import json
 import paho.mqtt.publish as publish
 from components.broker_settings import HOSTNAME, PORT
 
+# BATCH
 batch = []
 publish_data_counter = 0
 publish_data_limit = 5
 counter_lock = threading.Lock()
 
 def publisher_task(event, batch):
-    global publish_data_counter, publish_data_limit
+    global publish_data_counter
     while True:
         event.wait()
         with counter_lock:
@@ -21,16 +21,18 @@ def publisher_task(event, batch):
         publish.multiple(local_batch, hostname=HOSTNAME, port=PORT)
         event.clear()
 
+
 publish_event = threading.Event()
 publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, batch,))
 publisher_thread.daemon = True
 publisher_thread.start()
 
-def button_callback(value, settings, publish_event):
+
+def generic_button_callback(value, settings, publish_event):
     global publish_data_counter, publish_data_limit
 
     payload = {
-        "measurement": "Button",
+        "measurement": settings["measurement"],
         "simulated": settings['simulated'],
         "runs_on": settings["runs_on"],
         "name": settings["name"],
@@ -38,15 +40,19 @@ def button_callback(value, settings, publish_event):
     }
 
     with counter_lock:
-        batch.append(('Button', json.dumps(payload), 0, True))
+        batch.append((settings["measurement"], json.dumps(payload), 0, True))
         publish_data_counter += 1
 
     if publish_data_counter >= publish_data_limit:
         publish_event.set()
 
-def run_button(settings, threads, stop_event):
+
+def run_generic_button(settings, threads, stop_event):
     if settings['simulated']:
-        t = threading.Thread(target = run_button_simulator, args=(2, button_callback, stop_event, publish_event, settings))
+        t = threading.Thread(
+            target=run_button_simulator,
+            args=(2, generic_button_callback, stop_event, publish_event, settings)
+        )
         t.start()
         threads.append(t)
     else:
