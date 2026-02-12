@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 
 # InfluxDB Configuration
-token = "your_token"
+token = "9j45ZmqnOGoSx4XKPadoMPyot0zsX0DwZg3FpvuaDpKDFIuBomlqMCYTyT_CdRiTBjtijnb9qJXw8-9XIrH9zg=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "example_db"
@@ -35,11 +35,15 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("WEBC"),
     client.subscribe("DL"),
     client.subscribe("DB"),
+    client.subscribe("DHT1"),
+    client.subscribe("DHT2"),
+    client.subscribe("IR"),
+    client.subscribe("LCD"),
+    client.subscribe("DPIR3")
     client.subscribe("4SD")
 
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = lambda client, userdata, msg: save_to_db(json.loads(msg.payload.decode('utf-8')))
-
 
 def save_to_db(data):
     write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)

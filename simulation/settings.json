@@ -38,6 +38,48 @@
         "simulated": true,
         "topic": "actuators/led"
     },
+    "DHT1": {
+        "name": "Bedroom DHT",
+        "measurement": "DHT1",
+        "runs_on": "PI3",
+        "simulated": true,
+        "topic": "sensors/dht"
+    },
+    "DHT2": {
+        "name": "Master Bedroom DHT",
+        "measurement": "DHT2",
+        "runs_on": "PI3",
+        "simulated": true,
+        "topic": "sensors/dht"
+    },
+    "IR": {
+        "name": "Bedroom Infrared",
+        "measurement": "IR",
+        "runs_on": "PI3",
+        "simulated": true,
+        "topic": "sensors/ir"
+    },
+    "BRGB": {
+        "name": "Bedroom RGB",
+        "measurement": "BRGB",
+        "runs_on": "PI3",
+        "simulated": true,
+        "topic": "actuators/rgb"
+    },
+    "LCD": {
+        "name": "Living room Display",
+        "measurement": "LCD",
+        "runs_on": "PI3",
+        "simulated": true,
+        "topic": "actuators/lcd"
+    },
+    "DPIR3": {
+        "name": "Living Room Motion Sensor",
+        "measurement": "DPIR3",
+        "runs_on": "PI3",
+        "simulated": true,
+        "topic": "actuators/pir"
+    },
     "4SD": {
         "name": "4-Digit 7-Segment Timer",
         "runs_on": "PI2",
