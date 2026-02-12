@@ -1,4 +1,4 @@
-from simulators.pir import run_pir_simulator
+from simulators.ir import run_ir_simulator
 import threading
 import json
 import paho.mqtt.publish as publish
@@ -6,7 +6,7 @@ from components.broker_settings import HOSTNAME, PORT
 
 batch = []
 publish_data_counter = 0
-publish_data_limit = 5
+publish_data_limit = 2
 counter_lock = threading.Lock()
 
 def publisher_task(event, batch):
@@ -18,6 +18,7 @@ def publisher_task(event, batch):
             publish_data_counter = 0
             batch.clear()
         publish.multiple(local_batch, hostname=HOSTNAME, port=PORT)
+
         event.clear()
 
 publish_event = threading.Event()
@@ -25,8 +26,7 @@ publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, 
 publisher_thread.daemon = True
 publisher_thread.start()
 
-
-def pir_callback(motion, settings, publish_event):
+def ir_callback(code, publish_event, settings):
     global publish_data_counter, publish_data_limit
 
     payload = {
@@ -34,25 +34,26 @@ def pir_callback(motion, settings, publish_event):
         "simulated": settings['simulated'],
         "runs_on": settings["runs_on"],
         "name": settings["name"],
-        "value": 1 if motion else 0
+        "value": 1 if code else 0
     }
 
     with counter_lock:
         batch.append((settings['measurement'], json.dumps(payload), 0, True))
         publish_data_counter += 1
-    
+
     if publish_data_counter >= publish_data_limit:
         publish_event.set()
 
-
-def run_pir(settings, threads, stop_event):
-    if settings['simulated']:
-        t = threading.Thread(target=run_pir_simulator, args=(3, pir_callback, stop_event, publish_event, settings))
-        t.start()
-        threads.append(t)
-    else:
-        pass
-        # pir = PIR(settings['pin'])
-        # t = threading.Thread(target=run_pir_loop, args=(pir, 0.5, pir_callback, stop_event))
-        # t.start()
-        # threads.append(t)
+def run_ir(settings, threads, stop_event):
+        if settings['simulated']:
+            ir1_thread = threading.Thread(target = run_ir_simulator, args=(3, ir_callback, stop_event, publish_event, settings))
+            ir1_thread.start()
+            threads.append(ir1_thread)
+        else:
+            from sensors.ir import run_ir_loop, IR
+            print("Starting ir loop")
+            ir = IR(settings['pin'])
+            ir1_thread = threading.Thread(target=run_ir_loop, args=(ir, 2, ir_callback, stop_event))
+            ir1_thread.start()
+            threads.append(ir1_thread)
+            print("ir1 loop started")

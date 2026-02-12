@@ -4,6 +4,8 @@ from components.button import run_button
 from components.pir import run_pir
 from components.ultrasonic import run_ultrasonic
 from components.membrane import run_membrane
+from components.dht import run_dht
+from components.ir import run_ir
 from actuators.led import led_on, led_off
 from actuators.buzzer import buzzer_on, buzzer_off
 
@@ -16,16 +18,23 @@ def console_menu():
     print("q - Quit")
 
 if __name__ == "__main__":
-    print("Starting KT2 Smart Door Simulation")
+    print("Starting Smart House")
     settings = load_settings()
     threads = []
     stop_event = threading.Event()
 
     try:
-        run_button(settings['DS1'], threads, stop_event)
-        run_pir(settings['DPIR1'], threads, stop_event)
-        run_ultrasonic(settings['DUS1'], threads, stop_event)
-        run_membrane(settings['DMS'], threads, stop_event)
+        # run_button(settings['DS1'], threads, stop_event)
+        # run_pir(settings['DPIR1'], threads, stop_event)
+        # run_ultrasonic(settings['DUS1'], threads, stop_event)
+        # run_membrane(settings['DMS'], threads, stop_event)
+
+        # run_dht(settings['DHT1'], threads, stop_event)
+        # run_dht(settings['DHT2'], threads, stop_event)
+        # run_ir(settings['IR'], threads, stop_event)
+        # run_ir(settings['LCD'], threads, stop_event)
+        # run_pir(settings['DPIR3'], threads, stop_event)
+
 
         while True:
             console_menu()
