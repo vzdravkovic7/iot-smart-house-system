@@ -1,4 +1,4 @@
-from simulators.pir import run_pir_simulator
+from simulators.dht import run_dht_simulator
 import threading
 import json
 import paho.mqtt.publish as publish
@@ -21,42 +21,46 @@ def publisher_task(event, batch):
         event.clear()
 
 publish_event = threading.Event()
-
 publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, batch))
 publisher_thread.daemon = True
 publisher_thread.start()
 
 
-def pir_callback(motion, settings, publish_event):
+def dht_callback(temp, hum, settings, publish_event):
     global publish_data_counter, publish_data_limit
 
-    payload = {
-        "measurement": settings["measurement"],
-        "simulated": settings["simulated"],
-        "runs_on": settings["runs_on"],
-        "name": settings["name"],
-        "value": 1 if motion else 0
+    base_payload = {
+        "measurement": settings['measurement'],
+        "simulated": settings['simulated'],
+        "runs_on": settings["runs_on"]
     }
 
+    h_pay = base_payload.copy()
+    h_pay["name"] = f"{settings['name']}_humidity"
+    h_pay["value"] = hum
+    
+    t_pay = base_payload.copy()
+    t_pay["name"] = f"{settings['name']}_temperature"
+    t_pay["value"] = temp
+
     with counter_lock:
-        batch.append((settings["measurement"], json.dumps(payload), 0, True))
-        publish_data_counter += 1
+        batch.append((settings['measurement'], json.dumps(h_pay), 0, True))
+        batch.append((settings['measurement'], json.dumps(t_pay), 0, True))
+        
+        publish_data_counter += 2
 
     if publish_data_counter >= publish_data_limit:
         publish_event.set()
 
 
-def run_pir(settings, threads, stop_event):
+def run_dht(settings, threads, stop_event):
     if settings["simulated"]:
         t = threading.Thread(
-            target=run_pir_simulator,
-            args=(3, pir_callback, stop_event, publish_event, settings)
+            target=run_dht_simulator,
+            args=(5, dht_callback, stop_event, publish_event, settings)
         )
         t.start()
         threads.append(t)
     else:
         pass
-        # pir = PIR(settings['pin'])
-        # t = threading.Thread(target=run_pir_loop, args=(pir, 0.5, pir_callback, stop_event))
-        # t.start()
-        # threads.append(t)
+        # real dht
