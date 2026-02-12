@@ -1,17 +1,20 @@
 {
     "DS1": {
+        "measurement": "Button",
         "name": "Door Sensor 1",
         "runs_on": "PI1",
         "simulated": true,
         "topic": "sensors/button"
     },
     "DPIR1": {
+        "measurement": "PIR",
         "name": "Door Motion Sensor 1",
         "runs_on": "PI1",
         "simulated": true,
         "topic": "sensors/pir"
     },
     "DUS1": {
+        "measurement": "Ultrasonic",
         "name": "Door Ultrasonic Sensor 1",
         "runs_on": "PI1",
         "simulated": true,
@@ -34,5 +37,60 @@
         "runs_on": "PI1",
         "simulated": true,
         "topic": "actuators/led"
+    },
+    "4SD": {
+        "name": "4-Digit 7-Segment Timer",
+        "runs_on": "PI2",
+        "simulated": true,
+        "topic": "actuators/timer4sd"
+    },
+    "DS2": {
+        "measurement": "DS2",
+        "name": "Door Sensor 2",
+        "runs_on": "PI2",
+        "simulated": true,
+        "topic": "sensors/ds2"
+    },
+    "BTN": {
+        "measurement": "BTN",
+        "name": "Kitchen Button",
+        "runs_on": "PI2",
+        "simulated": true,
+        "topic": "sensors/btn"
+    },
+    "DPIR2": {
+        "measurement": "PIR2",
+        "name": "Door Motion Sensor 2",
+        "runs_on": "PI2",
+        "simulated": true,
+        "topic": "sensors/pir2"
+    },
+    "DUS2": {
+        "measurement": "Ultrasonic2",
+        "name": "Door Ultrasonic Sensor 2",
+        "runs_on": "PI2",
+        "simulated": true,
+        "topic": "sensors/ultrasonic2"
+    },
+    "DHT3": {
+        "measurement": "DHT3",
+        "name": "Kitchen DHT Sensor",
+        "runs_on": "PI2",
+        "simulated": true,
+        "topic": "sensors/dht3"
+    },
+    "GSG": {
+        "measurement": "GSG",
+        "name": "Gyroscope Sensor",
+        "runs_on": "PI2",
+        "simulated": true,
+        "topic": "sensors/gsg"
+    },
+    "WEBC": {
+        "measurement": "WEBC",
+        "name": "Door Web Camera",
+        "runs_on": "PI1",
+        "simulated": true,
+        "topic": "sensors/web_camera"
     }
 }

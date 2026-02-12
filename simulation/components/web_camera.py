@@ -1,4 +1,4 @@
-from simulators.pir import run_pir_simulator
+from simulators.web_camera import run_web_camera_simulator
 import threading
 import json
 import paho.mqtt.publish as publish
@@ -8,6 +8,7 @@ batch = []
 publish_data_counter = 0
 publish_data_limit = 5
 counter_lock = threading.Lock()
+publish_event = threading.Event()
 
 def publisher_task(event, batch):
     global publish_data_counter
@@ -20,22 +21,18 @@ def publisher_task(event, batch):
         publish.multiple(local_batch, hostname=HOSTNAME, port=PORT)
         event.clear()
 
-publish_event = threading.Event()
-
 publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, batch))
 publisher_thread.daemon = True
 publisher_thread.start()
 
-
-def pir_callback(motion, settings, publish_event):
-    global publish_data_counter, publish_data_limit
-
+def web_camera_callback(motion, settings, publish_event):
+    global publish_data_counter
     payload = {
         "measurement": settings["measurement"],
         "simulated": settings["simulated"],
         "runs_on": settings["runs_on"],
         "name": settings["name"],
-        "value": 1 if motion else 0
+        "value": motion
     }
 
     with counter_lock:
@@ -45,18 +42,14 @@ def pir_callback(motion, settings, publish_event):
     if publish_data_counter >= publish_data_limit:
         publish_event.set()
 
-
-def run_pir(settings, threads, stop_event):
+def run_web_camera(settings, threads, stop_event):
     if settings["simulated"]:
         t = threading.Thread(
-            target=run_pir_simulator,
-            args=(3, pir_callback, stop_event, publish_event, settings)
+            target=run_web_camera_simulator,
+            args=(3, web_camera_callback, stop_event, publish_event, settings)
         )
         t.start()
         threads.append(t)
     else:
         pass
-        # pir = PIR(settings['pin'])
-        # t = threading.Thread(target=run_pir_loop, args=(pir, 0.5, pir_callback, stop_event))
-        # t.start()
-        # threads.append(t)
+        # realna implementacija
