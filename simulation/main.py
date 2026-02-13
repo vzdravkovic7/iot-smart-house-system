@@ -29,11 +29,11 @@ if __name__ == "__main__":
     stop_event = threading.Event()
 
     try:
-        # run_dht(settings['DHT1'], threads, stop_event)
-        # run_dht(settings['DHT2'], threads, stop_event)
-        # run_ir(settings['IR'], threads, stop_event)
-        # run_ir(settings['LCD'], threads, stop_event)
-        # run_pir(settings['DPIR3'], threads, stop_event)
+        run_dht(settings['DHT1'], threads, stop_event)
+        run_dht(settings['DHT2'], threads, stop_event)
+        run_ir(settings['IR'], threads, stop_event)
+        run_ir(settings['LCD'], threads, stop_event)
+        run_pir(settings['DPIR3'], threads, stop_event)
 
         run_generic_button(settings['DS1'], threads, stop_event)
         run_generic_button(settings['DS2'], threads, stop_event)

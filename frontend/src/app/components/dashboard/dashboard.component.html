@@ -1,0 +1,20 @@
+<div class="container">
+    <h2>Smart House – Device Status</h2>
+
+    <div *ngIf="loading">Loading...</div>
+    <div *ngIf="error">Error loading state</div>
+
+    <div *ngIf="!loading && !error">
+        <div class="grid">
+            <div class="card" *ngFor="let dev of state | keyvalue">
+                <h3>{{ dev.key }}</h3>
+
+                <p><strong>Value:</strong> {{ dev.value.value }}</p>
+                <p><strong>Measurement:</strong> {{ dev.value.measurement }}</p>
+                <p><strong>Runs on:</strong> {{ dev.value.runs_on }}</p>
+                <p><strong>Simulated:</strong> {{ dev.value.simulated }}</p>
+                <p><strong>Timestamp:</strong> {{ dev.value.timestamp }}</p>
+            </div>
+        </div>
+    </div>
+</div>

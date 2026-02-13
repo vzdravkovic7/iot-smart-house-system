@@ -1,15 +1,16 @@
+from state_manager import update_state, get_all_state, get_state
 from flask import Flask, jsonify, request
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 import paho.mqtt.client as mqtt
 import json
-
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # InfluxDB Configuration
-token = "9j45ZmqnOGoSx4XKPadoMPyot0zsX0DwZg3FpvuaDpKDFIuBomlqMCYTyT_CdRiTBjtijnb9qJXw8-9XIrH9zg=="
+token = "your_token"
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "example_db"
@@ -43,7 +44,28 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("4SD")
 
 mqtt_client.on_connect = on_connect
-mqtt_client.on_message = lambda client, userdata, msg: save_to_db(json.loads(msg.payload.decode('utf-8')))
+
+def on_message(client, userdata, msg):
+    parsed = json.loads(msg.payload.decode('utf-8'))
+
+    if isinstance(parsed, list):
+        for data in parsed:
+            process_data(data)
+    else:
+        process_data(parsed)
+
+def process_data(data):
+    update_state(
+        measurement=data["measurement"],
+        name=data["name"],
+        value=data["value"],
+        runs_on=data["runs_on"],
+        simulated=data["simulated"]
+    )
+
+    save_to_db(data)
+
+mqtt_client.on_message = on_message
 
 def save_to_db(data):
     write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
@@ -99,6 +121,16 @@ def retrieve_aggregate_data():
     |> mean()"""
     return handle_influx_query(query)
 
+@app.route("/api/state", methods=["GET"])
+def api_all_state():
+    return jsonify(get_all_state())
+
+@app.route("/api/state/<name>", methods=["GET"])
+def api_device_state(name):
+    result = get_state(name)
+    if result is None:
+        return jsonify({"error": "Not found"}), 404
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)
