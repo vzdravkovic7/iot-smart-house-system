@@ -5,7 +5,7 @@ from components.broker_settings import HOSTNAME, PORT
 
 batch = []
 publish_data_counter = 0
-publish_data_limit = 2
+publish_data_limit = 1
 counter_lock = threading.Lock()
 
 def publisher_task(event, batch):
@@ -43,12 +43,15 @@ def led_callback(value, settings):
     if publish_data_counter >= publish_data_limit:
         publish_event.set()
 
-
 def led_on(settings):
     print("[DL] LED turned ON")
     led_callback(1, settings)
-
+    settings["turned_on"] = True
+    
+    timer = threading.Timer(10.0, led_off, args=(settings,))
+    timer.start()
 
 def led_off(settings):
     print("[DL] LED turned OFF")
     led_callback(0, settings)
+    settings["turned_on"] = False

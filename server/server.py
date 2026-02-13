@@ -10,7 +10,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # InfluxDB Configuration
-token = "your_token"
+token = "9j45ZmqnOGoSx4XKPadoMPyot0zsX0DwZg3FpvuaDpKDFIuBomlqMCYTyT_CdRiTBjtijnb9qJXw8-9XIrH9zg=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "example_db"

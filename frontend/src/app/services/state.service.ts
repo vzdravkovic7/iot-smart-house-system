@@ -11,12 +11,10 @@ export class StateService {
 
     constructor(private http: HttpClient) { }
 
-    // Vrati stanje svih uredjaja
     getAllState(): Observable<any> {
         return this.http.get(`${this.apiUrl}/state`);
     }
 
-    // Vrati stanje pojedinačnog uređaja
     getDeviceState(name: string): Observable<any> {
         return this.http.get(`${this.apiUrl}/state/${name}`);
     }

@@ -33,6 +33,7 @@ export class DashboardComponent implements OnInit {
   loadState() {
     this.stateService.getAllState().subscribe({
       next: (data) => {
+        console.log("dejta", data)
         this.state = data;
         this.loading = false;
       },

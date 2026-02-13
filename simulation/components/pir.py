@@ -1,12 +1,14 @@
 from simulators.pir import run_pir_simulator
+from actuators.led import led_on, led_off
 import threading
+import time
 import json
 import paho.mqtt.publish as publish
 from components.broker_settings import HOSTNAME, PORT
 
 batch = []
 publish_data_counter = 0
-publish_data_limit = 5
+publish_data_limit = 1
 counter_lock = threading.Lock()
 
 def publisher_task(event, batch):
@@ -26,8 +28,7 @@ publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, 
 publisher_thread.daemon = True
 publisher_thread.start()
 
-
-def pir_callback(motion, settings, publish_event):
+def pir_callback(motion, settings, publish_event, diode_settings):
     global publish_data_counter, publish_data_limit
 
     payload = {
@@ -38,6 +39,9 @@ def pir_callback(motion, settings, publish_event):
         "value": 1 if motion else 0
     }
 
+    if motion and not diode_settings["turned_on"]:
+        led_on(diode_settings)
+    
     with counter_lock:
         batch.append((settings["measurement"], json.dumps(payload), 0, True))
         publish_data_counter += 1
@@ -45,10 +49,9 @@ def pir_callback(motion, settings, publish_event):
     if publish_data_counter >= publish_data_limit:
         publish_event.set()
 
-
-def run_pir(settings, threads, stop_event):
+def run_pir(settings, diode_settings, threads, stop_event):
     if settings['simulated']:
-        t = threading.Thread(target=run_pir_simulator, args=(3, pir_callback, stop_event, publish_event, settings))
+        t = threading.Thread(target=run_pir_simulator, args=(5, pir_callback, stop_event, publish_event, settings, diode_settings))
         t.start()
         threads.append(t)
     else:
