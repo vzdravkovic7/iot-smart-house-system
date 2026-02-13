@@ -35,7 +35,6 @@
     "DL": {
         "name": "Door Light 1",
         "runs_on": "PI1",
-        "turned_on": false,
         "simulated": true,
         "topic": "actuators/led"
     },

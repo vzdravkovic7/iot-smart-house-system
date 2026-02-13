@@ -39,9 +39,6 @@ def pir_callback(motion, settings, publish_event, diode_settings):
         "value": 1 if motion else 0
     }
 
-    if motion and not diode_settings["turned_on"]:
-        led_on(diode_settings)
-    
     with counter_lock:
         batch.append((settings["measurement"], json.dumps(payload), 0, True))
         publish_data_counter += 1

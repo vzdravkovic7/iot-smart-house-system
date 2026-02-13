@@ -7,7 +7,7 @@ from components.broker_settings import HOSTNAME, PORT
 # BATCH
 batch = []
 publish_data_counter = 0
-publish_data_limit = 5
+publish_data_limit = 1
 counter_lock = threading.Lock()
 
 def publisher_task(event, batch):
@@ -51,7 +51,7 @@ def run_generic_button(settings, threads, stop_event):
     if settings['simulated']:
         t = threading.Thread(
             target=run_button_simulator,
-            args=(2, generic_button_callback, stop_event, publish_event, settings)
+            args=(1, generic_button_callback, stop_event, publish_event, settings)
         )
         t.start()
         threads.append(t)

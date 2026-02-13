@@ -5,6 +5,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 import paho.mqtt.client as mqtt
 import json
 from flask_cors import CORS
+import threading
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -15,7 +16,6 @@ org = "FTN"
 url = "http://localhost:8086"
 bucket = "example_db"
 influxdb_client = InfluxDBClient(url=url, token=token, org=org)
-
 
 # MQTT Configuration
 mqtt_client = mqtt.Client()
@@ -54,7 +54,15 @@ def on_message(client, userdata, msg):
     else:
         process_data(parsed)
 
+last_dus1_value = None
+last_dus2_value = None
+people_count = 0
+ALARM = False
+door_timers = {}
+
 def process_data(data):
+    global last_dus1_value, last_dus2_value, people_count, ALARM
+
     update_state(
         measurement=data["measurement"],
         name=data["name"],
@@ -63,7 +71,84 @@ def process_data(data):
         simulated=data["simulated"]
     )
 
+    if data["name"] in ["Door Motion Sensor 1", "Door Motion Sensor 2"] and data["value"] == 1:
+        dus_state1 = get_state("Door Ultrasonic Sensor 1")
+        dus_state2 = get_state("Door Ultrasonic Sensor 2")
+
+        mqtt_client.publish("commands/DL", json.dumps({"action": "ON"}))
+        
+        if dus_state1 and last_dus1_value is not None:
+            current_dist = dus_state1['value']
+            
+            if last_dus1_value > current_dist + 10:
+                people_count += 1
+                save_people_count(people_count)
+                
+            elif last_dus1_value < current_dist - 10:
+                people_count = max(0, people_count - 1)
+                save_people_count(people_count)
+
+        if dus_state1:
+            last_dus1_value = dus_state1['value']
+
+        # dus2
+        if dus_state2 and last_dus2_value is not None:
+            current_dist = dus_state2['value']
+            
+            if last_dus2_value > current_dist + 10:
+                people_count += 1
+                save_people_count(people_count)
+                
+            elif last_dus2_value < current_dist - 10:
+                people_count = max(0, people_count - 1)
+                save_people_count(people_count)
+
+        if dus_state2:
+            last_dus2_value = dus_state2['value']
+
+    if data["name"] in ["Door Sensor 1", "Door Sensor 2"]:
+        sensor_name = data["name"]
+        door_open = data["value"]
+
+        if door_open == 1:
+            if sensor_name not in door_timers or not door_timers[sensor_name].is_alive():
+                t = threading.Timer(5.0, activate_alarm)
+                door_timers[sensor_name] = t
+                t.start()
+        else:
+            if sensor_name in door_timers:
+                door_timers[sensor_name].cancel()
+                del door_timers[sensor_name]
+            
+            if ALARM:
+                ALARM = False
+                activate_buzzer(False)
+                save_to_db({"measurement": "ALARM", "name": "Security System", "value": 0, "simulated": True, "runs_on": "Server"})
+
     save_to_db(data)
+
+def save_people_count(count):
+    write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
+    point = Point("PEOPLE_COUNT").field("value", count)
+    write_api.write(bucket=bucket, org=org, record=point)
+
+def activate_buzzer(isOn):
+    mqtt_client.publish("commands/DB", json.dumps({"action": isOn}))
+
+def activate_alarm():
+    global ALARM
+    ALARM = True
+
+    activate_buzzer(True)
+
+    payload = {
+        "measurement": "ALARM",
+        "name": "Security System",
+        "value": 1,
+        "simulated": True,
+        "runs_on": "Server"
+    }
+    save_to_db(payload)
 
 mqtt_client.on_message = on_message
 
