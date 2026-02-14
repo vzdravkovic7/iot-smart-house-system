@@ -7,6 +7,7 @@ import json
 from flask_cors import CORS
 import threading
 import math
+import time
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -41,7 +42,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("DHT2"),
     client.subscribe("IR"),
     client.subscribe("LCD"),
-    client.subscribe("DPIR3")
+    client.subscribe("DPIR3"),
     client.subscribe("4SD")
 
 mqtt_client.on_connect = on_connect
@@ -65,7 +66,13 @@ people_count = 0
 ALARM = False
 door_timers = {}
 last_gsg_magnitude = None
-gsg_threshold = 3.0 
+gsg_threshold = 3.0
+current_dht_index = 0
+dht_names = [
+    ("Bedroom DHT_temperature", "Bedroom DHT_humidity"),
+    ("Master Bedroom DHT_temperature", "Master Bedroom DHT_humidity"),
+    ("Kitchen DHT Sensor_temperature", "Kitchen DHT Sensor_humidity")
+]
 
 def process_data(data):
     global last_dus1_value, last_dus2_value, people_count, LED_active, ALARM
@@ -249,6 +256,27 @@ def handle_gsg_motion():
     if diff > gsg_threshold:
         activate_alarm()
 
+def show_next_dht_on_lcd():
+    global current_dht_index
+
+    temp_key, hum_key = dht_names[current_dht_index]
+
+    tem = get_state(temp_key)
+    hum = get_state(hum_key)
+
+    if tem and hum:
+        temperature = tem["value"]
+        humidity = hum["value"]
+        text = f"DHT{current_dht_index+1}: Temp={temperature}°C | Hum={humidity}%"
+    else:
+        text = f"DHT{current_dht_index+1}: No data"
+
+    print("text: ", text)
+
+    mqtt_client.publish("commands/LCD", json.dumps({"display": text}))
+
+    current_dht_index = (current_dht_index + 1) % 3
+
 def save_to_db(data):
     write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
     point = (
@@ -325,5 +353,13 @@ def api_device_state(name):
         return jsonify({"error": "Not found"}), 404
     return jsonify(result)
 
+def lcd_rotation_loop():
+    while True:
+        show_next_dht_on_lcd()
+        time.sleep(4)
+
 if __name__ == '__main__':
+    lcd_thread = threading.Thread(target=lcd_rotation_loop)
+    lcd_thread.daemon = True
+    lcd_thread.start()
     app.run(debug=True)
