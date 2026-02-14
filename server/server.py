@@ -271,8 +271,6 @@ def show_next_dht_on_lcd():
     else:
         text = f"DHT{current_dht_index+1}: No data"
 
-    print("text: ", text)
-
     mqtt_client.publish("commands/LCD", json.dumps({"display": text}))
 
     current_dht_index = (current_dht_index + 1) % 3
@@ -362,4 +360,4 @@ if __name__ == '__main__':
     lcd_thread = threading.Thread(target=lcd_rotation_loop)
     lcd_thread.daemon = True
     lcd_thread.start()
-    app.run(debug=True)
+    app.run(debug=False)
