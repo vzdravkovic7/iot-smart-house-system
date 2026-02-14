@@ -6,12 +6,13 @@ import paho.mqtt.client as mqtt
 import json
 from flask_cors import CORS
 import threading
+import math
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # InfluxDB Configuration
-token = "9j45ZmqnOGoSx4XKPadoMPyot0zsX0DwZg3FpvuaDpKDFIuBomlqMCYTyT_CdRiTBjtijnb9qJXw8-9XIrH9zg=="
+token = "WD4Q5MzZQNEri0gIvn-Zq8YPU45ddMzVRnyZ5DVuAbihnD8wFmdHud-2l5x0wbsl_PJ2QOybiHJHF0qyO7P3eQ=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "example_db"
@@ -63,6 +64,8 @@ system_pin = 1312
 people_count = 0
 ALARM = False
 door_timers = {}
+last_gsg_magnitude = None
+gsg_threshold = 3.0 
 
 def process_data(data):
     global last_dus1_value, last_dus2_value, people_count, LED_active, ALARM
@@ -75,10 +78,15 @@ def process_data(data):
         simulated=data["simulated"]
     )
 
+    if data["name"] in ["Gyroscope Sensor_x", "Gyroscope Sensor_y", "Gyroscope Sensor_z"]:
+        handle_gsg_motion()
+
     if data["name"] in ["Door Membrane Switch 1"]:
         timer = threading.Timer(2.0, arm_system, args=(data["value"],))
         timer.start()
 
+    if data["name"] in ["Door Motion Sensor 1", "Door Motion Sensor 2", "Living Room Motion Sensor"] and data["value"] == 1 and people_count == 0:
+        activate_alarm()
 
     if data["name"] in ["Door Motion Sensor 1", "Door Motion Sensor 2"] and data["value"] == 1:
         dus_state1 = get_state("Door Ultrasonic Sensor 1")
@@ -213,6 +221,33 @@ def activate_alarm():
     save_to_db(payload)
 
 mqtt_client.on_message = on_message
+
+def handle_gsg_motion():
+    global last_gsg_magnitude, gsg_threshold
+    
+    gx = get_state("Gyroscope Sensor_x")
+    gy = get_state("Gyroscope Sensor_y")
+    gz = get_state("Gyroscope Sensor_z")
+
+    if not gx or not gy or not gz:
+        return
+
+    x = gx["value"]
+    y = gy["value"]
+    z = gz["value"]
+
+    magnitude = math.sqrt(x*x + y*y + z*z)
+
+    if last_gsg_magnitude is None:
+        last_gsg_magnitude = magnitude
+        return
+
+    diff = abs(magnitude - last_gsg_magnitude)
+
+    last_gsg_magnitude = magnitude
+
+    if diff > gsg_threshold:
+        activate_alarm()
 
 def save_to_db(data):
     write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
