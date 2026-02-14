@@ -1,5 +1,8 @@
-<div class="container">
-    <h2>Smart House – Device Status</h2>
+<div class="container" [style.background-color]="ALARM ? 'red' : 'white'">
+    <h2>Smart House - Device Status</h2>
+    <h3>SECURITY SYSTEM ARMED - {{ !!system_armed }}</h3>
+    <button (click)="switchSystemArmed()">{{system_armed ? "DEACTIVATE" : "ACTIVATE"}} SYSTEM ARMED</button>
+    <button (click)="switchAlarm()">{{ALARM ? "DEACTIVATE" : "ACTIVATE"}} ALARM</button>
 
     <div *ngIf="loading">Loading...</div>
     <div *ngIf="error">Error loading state</div>

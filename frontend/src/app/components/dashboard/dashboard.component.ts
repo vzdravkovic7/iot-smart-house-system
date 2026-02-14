@@ -22,6 +22,8 @@ export class DashboardComponent implements OnInit {
   state: Record<string, DeviceState> = {};
   loading = true;
   error = false;
+  ALARM = false;
+  system_armed = false;
 
   constructor(private stateService: StateService) { }
 
@@ -34,6 +36,8 @@ export class DashboardComponent implements OnInit {
     this.stateService.getAllState().subscribe({
       next: (data) => {
         console.log("dejta", data)
+        this.ALARM = data["ALARM"]["value"]
+        this.system_armed = data["system_armed"]["value"]
         this.state = data;
         this.loading = false;
       },
@@ -42,5 +46,21 @@ export class DashboardComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  switchSystemArmed() {
+    this.stateService.switchSystemArmed().subscribe({
+      next: () => {
+        this.system_armed = !this.system_armed;
+      }
+    })
+  }
+
+  switchAlarm() {
+    this.stateService.switchAlarm().subscribe({
+      next: () => {
+        this.ALARM = !this.ALARM;
+      }
+    })
   }
 }

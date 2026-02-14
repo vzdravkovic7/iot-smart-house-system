@@ -3,7 +3,7 @@ from settings import load_settings
 from components.generic_button import run_generic_button
 from components.pir import run_pir
 from components.ultrasonic import run_ultrasonic
-from components.membrane import run_membrane
+from actuators.membrane import membrane_input
 from components.dht import run_dht
 from components.ir import run_ir
 from components.gyro import run_gyro
@@ -20,6 +20,7 @@ def console_menu():
     print("4 - BUZZER OFF")
     print("5 - SET TIMER VALUE")
     print("6 - CLEAR TIMER")
+    print("7 - Enter pin")
     print("q - Quit")
 
 if __name__ == "__main__":
@@ -42,7 +43,6 @@ if __name__ == "__main__":
         run_pir(settings["DPIR2"], settings['DL'], threads, stop_event)
         run_ultrasonic(settings['DUS1'], threads, stop_event)
         run_ultrasonic(settings["DUS2"], threads, stop_event)
-        run_membrane(settings['DMS'], threads, stop_event)
         run_dht(settings["DHT3"], threads, stop_event)
         run_gyro(settings["GSG"], threads, stop_event)
         run_web_camera(settings["WEBC"], threads, stop_event)
@@ -64,6 +64,8 @@ if __name__ == "__main__":
                 timer_set(settings['4SD'], value)
             elif cmd == "6":
                 timer_clear(settings['4SD'])
+            elif cmd == "7":
+                membrane_input(settings['DMS'])
             elif cmd.lower() == "q":
                 break
 

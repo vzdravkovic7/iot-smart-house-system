@@ -15,6 +15,14 @@ export class StateService {
         return this.http.get(`${this.apiUrl}/state`);
     }
 
+    switchSystemArmed(): Observable<any> {
+        return this.http.get(`${this.apiUrl}/system`);
+    }
+
+    switchAlarm(): Observable<any> {
+        return this.http.get(`${this.apiUrl}/alarm`);
+    }
+
     getDeviceState(name: string): Observable<any> {
         return this.http.get(`${this.apiUrl}/state/${name}`);
     }

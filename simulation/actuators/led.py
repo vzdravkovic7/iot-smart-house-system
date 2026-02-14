@@ -48,9 +48,6 @@ def led_callback(value, settings):
 def led_on(settings):
     print("[DL] LED turned ON")
     led_callback(1, settings)
-    
-    timer = threading.Timer(10.0, led_off, args=(settings,))
-    timer.start()
 
 def led_off(settings):
     print("[DL] LED turned OFF")
@@ -60,6 +57,8 @@ def on_command_received(client, userdata, msg):
     payload = json.loads(msg.payload.decode('utf-8'))
     if payload.get("action") == "ON":
         led_on(load_settings()["DL"])
+    if payload.get("action") == "OFF":
+        led_off(load_settings()["DL"])
 
 cmd_client = mqtt.Client()
 cmd_client.on_message = on_command_received

@@ -56,12 +56,16 @@ def on_message(client, userdata, msg):
 
 last_dus1_value = None
 last_dus2_value = None
+buzzer_active = False
+LED_active = False
+system_armed = False
+system_pin = 1312
 people_count = 0
 ALARM = False
 door_timers = {}
 
 def process_data(data):
-    global last_dus1_value, last_dus2_value, people_count, ALARM
+    global last_dus1_value, last_dus2_value, people_count, LED_active, ALARM
 
     update_state(
         measurement=data["measurement"],
@@ -71,12 +75,22 @@ def process_data(data):
         simulated=data["simulated"]
     )
 
+    if data["name"] in ["Door Membrane Switch 1"]:
+        timer = threading.Timer(2.0, arm_system, args=(data["value"],))
+        timer.start()
+
+
     if data["name"] in ["Door Motion Sensor 1", "Door Motion Sensor 2"] and data["value"] == 1:
         dus_state1 = get_state("Door Ultrasonic Sensor 1")
         dus_state2 = get_state("Door Ultrasonic Sensor 2")
 
-        mqtt_client.publish("commands/DL", json.dumps({"action": "ON"}))
-        
+        if not LED_active:
+            LED_active = not LED_active
+            mqtt_client.publish("commands/DL", json.dumps({"action": "ON"}))
+    
+            timer = threading.Timer(10.0, led_off)
+            timer.start()
+
         if dus_state1 and last_dus1_value is not None:
             current_dist = dus_state1['value']
             
@@ -111,7 +125,9 @@ def process_data(data):
         door_open = data["value"]
 
         if door_open == 1:
-            if sensor_name not in door_timers or not door_timers[sensor_name].is_alive():
+            if system_armed:
+                activate_alarm()
+            elif sensor_name not in door_timers or not door_timers[sensor_name].is_alive():
                 t = threading.Timer(5.0, activate_alarm)
                 door_timers[sensor_name] = t
                 t.start()
@@ -120,10 +136,8 @@ def process_data(data):
                 door_timers[sensor_name].cancel()
                 del door_timers[sensor_name]
             
-            if ALARM:
-                ALARM = False
-                activate_buzzer(False)
-                save_to_db({"measurement": "ALARM", "name": "Security System", "value": 0, "simulated": True, "runs_on": "Server"})
+            if ALARM and not system_armed:
+                deactivate_alarm()
 
     save_to_db(data)
 
@@ -132,8 +146,49 @@ def save_people_count(count):
     point = Point("PEOPLE_COUNT").field("value", count)
     write_api.write(bucket=bucket, org=org, record=point)
 
+def led_off():
+    global LED_active
+    
+    LED_active = not LED_active
+    mqtt_client.publish("commands/DL", json.dumps({"action": "OFF"}))
+
 def activate_buzzer(isOn):
-    mqtt_client.publish("commands/DB", json.dumps({"action": isOn}))
+    global buzzer_active
+
+    if not buzzer_active and isOn:
+        buzzer_active = not buzzer_active
+        mqtt_client.publish("commands/DB", json.dumps({"action": buzzer_active}))
+    elif buzzer_active and not isOn:
+        buzzer_active = not buzzer_active
+        mqtt_client.publish("commands/DB", json.dumps({"action": buzzer_active}))
+
+def arm_system(pin):
+    global system_armed
+
+    if int(pin) == system_pin:
+        system_armed = not system_armed
+        update_state(
+            measurement="system_armed",
+            name="system_armed",
+            value=int(system_armed),
+            runs_on="Server",
+            simulated=True
+        )
+        save_to_db({"measurement": "system_armed", "name": "Security System", "value": int(system_armed), "simulated": True, "runs_on": "Server"})
+        deactivate_alarm()
+
+def deactivate_alarm():
+    global ALARM
+    ALARM = False
+    activate_buzzer(False)
+    update_state(
+        measurement="ALARM",
+        name="ALARM",
+        value=0,
+        runs_on="Server",
+        simulated=True
+    )
+    save_to_db({"measurement": "ALARM", "name": "Security System", "value": 0, "simulated": True, "runs_on": "Server"})
 
 def activate_alarm():
     global ALARM
@@ -143,11 +198,18 @@ def activate_alarm():
 
     payload = {
         "measurement": "ALARM",
-        "name": "Security System",
+        "name": "ALARM",
         "value": 1,
         "simulated": True,
         "runs_on": "Server"
     }
+    update_state(
+        measurement="ALARM",
+        name="ALARM",
+        value=1,
+        runs_on="Server",
+        simulated=True
+    )
     save_to_db(payload)
 
 mqtt_client.on_message = on_message
@@ -209,6 +271,17 @@ def retrieve_aggregate_data():
 @app.route("/api/state", methods=["GET"])
 def api_all_state():
     return jsonify(get_all_state())
+
+@app.route("/api/alarm", methods=["GET"])
+def switch_alarm():
+    global ALARM
+    deactivate_alarm() if ALARM else activate_alarm()
+    return jsonify(True)
+
+@app.route("/api/system", methods=["GET"])
+def switch_system():
+    arm_system(1312)
+    return jsonify(True)
 
 @app.route("/api/state/<name>", methods=["GET"])
 def api_device_state(name):

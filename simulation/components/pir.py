@@ -1,7 +1,5 @@
 from simulators.pir import run_pir_simulator
-from actuators.led import led_on, led_off
 import threading
-import time
 import json
 import paho.mqtt.publish as publish
 from components.broker_settings import HOSTNAME, PORT
