@@ -1,7 +1,10 @@
 import threading
 import json
+import time
+import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 from components.broker_settings import HOSTNAME, PORT
+from settings import load_settings
 
 batch = []
 publish_data_counter = 0
@@ -45,12 +48,26 @@ def timer_callback(value, settings):
     if publish_data_counter >= publish_data_limit:
         publish_event.set()
 
-
 def timer_set(settings, value):
     print(f"[4SD] Timer set to {value}")
     timer_callback(value, settings)
 
+def timer_blink():
+    print(f"[4SD] Timer Blinking")
 
 def timer_clear(settings):
     print("[4SD] Timer cleared")
     timer_callback(0, settings)
+
+def on_command_received(client, userdata, msg):
+    payload = json.loads(msg.payload.decode('utf-8'))
+    if payload.get("blink") == -1:
+        timer_blink()
+    elif payload.get("stopwatch"):
+        timer_set(load_settings()["4SD"], payload.get("stopwatch"))
+
+cmd_client = mqtt.Client()
+cmd_client.on_message = on_command_received
+cmd_client.connect(HOSTNAME, PORT, 60)
+cmd_client.subscribe("commands/4SD")
+cmd_client.loop_start()

@@ -1,0 +1,17 @@
+.container {
+  padding: 20px;
+  font-family: sans-serif;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  border-radius: 8px;
+  background: #f3f3f3;
+  padding: 16px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+}

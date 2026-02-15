@@ -1,0 +1,71 @@
+<div class="container" [style.background-color]="ALARM ? 'red' : 'white'">
+    <h2>Smart House - Device Status</h2>
+    <h3>SECURITY SYSTEM ARMED - {{ !!system_armed }}</h3>
+    <button (click)="switchSystemArmed()">{{system_armed ? "DEACTIVATE" : "ACTIVATE"}} SYSTEM ARMED</button>
+    <button (click)="switchAlarm()">{{ALARM ? "DEACTIVATE" : "ACTIVATE"}} ALARM</button>
+
+    <input class="time" type="number" [(ngModel)]="stopwatch" placeholder="Enter time for Stopwatch">
+    <button (click)="updateStopwatch()">Update</button>
+
+    <input class="time" type="number" [(ngModel)]="mode" placeholder="Enter BRGB Diode mode">
+    <button (click)="updateBRGB()">Update</button>
+
+    <!-- <h2>Live Camera Stream</h2> -->
+
+    <!-- <img src="http://localhost:8080/?action=stream" alt="Web Camera Stream"
+        style="width: 100%; height: auto; border: 2px solid black;"> -->
+
+    <div *ngIf="loading">Loading...</div>
+    <div *ngIf="error">Error loading state</div>
+
+    <div *ngIf="!loading && !error">
+        <div class="grid">
+            <div class="card" *ngFor="let dev of state | keyvalue">
+                <h3>{{ dev.key }}</h3>
+
+                <p><strong>Value:</strong> {{ dev.value.value }}</p>
+                <p><strong>Measurement:</strong> {{ dev.value.measurement }}</p>
+                <p><strong>Runs on:</strong> {{ dev.value.runs_on }}</p>
+                <p><strong>Simulated:</strong> {{ dev.value.simulated }}</p>
+                <p><strong>Timestamp:</strong> {{ dev.value.timestamp }}</p>
+            </div>
+        </div>
+    </div>
+    <iframe
+        src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&panelId=14&refresh=10s&__feature.dashboardSceneSolo=true"
+        width="450" height="200" frameborder="0"></iframe>
+    <br>
+    <!-- <iframe
+        src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&panelId=2&refresh=10s&__feature.dashboardSceneSolo=true"
+        width="450" height="200" frameborder="0"></iframe>
+
+    <br>
+    <iframe
+        src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&panelId=3&refresh=10s&__feature.dashboardSceneSolo=true"
+        width="450" height="200" frameborder="0"></iframe>
+
+    <br>
+    <iframe
+        src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&panelId=4&refresh=10s&__feature.dashboardSceneSolo=true"
+        width="450" height="200" frameborder="0"></iframe>
+    <br>
+    <iframe
+        src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&panelId=5&refresh=10s&__feature.dashboardSceneSolo=true"
+        width="450" height="200" frameborder="0"></iframe>
+    <br>
+    <iframe
+        src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&panelId=6&refresh=10s&__feature.dashboardSceneSolo=true"
+        width="450" height="200" frameborder="0"></iframe>
+    <br>
+    <iframe
+        src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&panelId=7&refresh=10s&__feature.dashboardSceneSolo=true"
+        width="450" height="200" frameborder="0"></iframe>
+    <br>
+    <iframe
+        src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&panelId=8&refresh=10s&__feature.dashboardSceneSolo=true"
+        width="450" height="200" frameborder="0"></iframe>
+
+    <iframe
+        src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=1770973944059&to=1770974131185&timezone=browser&panelId=13&__feature.dashboardSceneSolo=true"
+        width="450" height="200" frameborder="0"></iframe> -->
+</div>
