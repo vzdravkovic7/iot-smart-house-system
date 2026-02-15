@@ -4,6 +4,9 @@
     <button (click)="switchSystemArmed()">{{system_armed ? "DEACTIVATE" : "ACTIVATE"}} SYSTEM ARMED</button>
     <button (click)="switchAlarm()">{{ALARM ? "DEACTIVATE" : "ACTIVATE"}} ALARM</button>
 
+    <input class="time" type="number" [(ngModel)]="stopwatch" placeholder="Enter time for Stopwatch">
+    <button (click)="updateStopwatch()">Update</button>
+
     <div *ngIf="loading">Loading...</div>
     <div *ngIf="error">Error loading state</div>
 

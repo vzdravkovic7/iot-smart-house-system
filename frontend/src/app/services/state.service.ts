@@ -23,6 +23,10 @@ export class StateService {
         return this.http.get(`${this.apiUrl}/alarm`);
     }
 
+    updateStopwatch(time: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/stopwatch`, { stopwatch: time })
+    }
+
     getDeviceState(name: string): Observable<any> {
         return this.http.get(`${this.apiUrl}/state/${name}`);
     }

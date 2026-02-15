@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { StateService } from '../../services/state.service';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 interface DeviceState {
   value: number | string;
@@ -13,7 +14,7 @@ interface DeviceState {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -24,6 +25,7 @@ export class DashboardComponent implements OnInit {
   error = false;
   ALARM = false;
   system_armed = false;
+  stopwatch = '';
 
   constructor(private stateService: StateService) { }
 
@@ -61,6 +63,12 @@ export class DashboardComponent implements OnInit {
       next: () => {
         this.ALARM = !this.ALARM;
       }
+    })
+  }
+
+  updateStopwatch() {
+    this.stateService.updateStopwatch(this.stopwatch).subscribe({
+      next: () => { }
     })
   }
 }

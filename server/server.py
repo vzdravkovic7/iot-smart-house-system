@@ -13,7 +13,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # InfluxDB Configuration
-token = "WD4Q5MzZQNEri0gIvn-Zq8YPU45ddMzVRnyZ5DVuAbihnD8wFmdHud-2l5x0wbsl_PJ2QOybiHJHF0qyO7P3eQ=="
+token = "9j45ZmqnOGoSx4XKPadoMPyot0zsX0DwZg3FpvuaDpKDFIuBomlqMCYTyT_CdRiTBjtijnb9qJXw8-9XIrH9zg=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "example_db"
@@ -68,6 +68,10 @@ door_timers = {}
 last_gsg_magnitude = None
 gsg_threshold = 3.0
 current_dht_index = 0
+stopwatch = 0
+blinking = False
+N = 0
+
 dht_names = [
     ("Bedroom DHT_temperature", "Bedroom DHT_humidity"),
     ("Master Bedroom DHT_temperature", "Master Bedroom DHT_humidity"),
@@ -75,7 +79,7 @@ dht_names = [
 ]
 
 def process_data(data):
-    global last_dus1_value, last_dus2_value, people_count, LED_active, ALARM
+    global last_dus1_value, last_dus2_value, people_count, LED_active, stopwatch, blinking, N, ALARM
 
     update_state(
         measurement=data["measurement"],
@@ -84,6 +88,13 @@ def process_data(data):
         runs_on=data["runs_on"],
         simulated=data["simulated"]
     )
+
+    if data["name"] in ["Kitchen Button"] and data["value"] == 1:
+        if blinking:
+            blinking = False
+            mqtt_client.publish("commands/4SD", json.dumps({"stopwatch": 0}))
+        else:
+            stopwatch += N
 
     if data["name"] in ["Gyroscope Sensor_x", "Gyroscope Sensor_y", "Gyroscope Sensor_z"]:
         handle_gsg_motion()
@@ -256,6 +267,12 @@ def handle_gsg_motion():
     if diff > gsg_threshold:
         activate_alarm()
 
+def show_next_dht_on_stopwatch():
+    global stopwatch
+
+    if stopwatch > 0:
+        mqtt_client.publish("commands/4SD", json.dumps({"stopwatch": stopwatch}))
+
 def show_next_dht_on_lcd():
     global current_dht_index
 
@@ -344,6 +361,13 @@ def switch_system():
     arm_system(1312)
     return jsonify(True)
 
+@app.route("/api/stopwatch", methods=["POST"])
+def updateStopwatch():
+    global N
+    N = int(request.json['stopwatch'])
+    
+    return jsonify(True)
+
 @app.route("/api/state/<name>", methods=["GET"])
 def api_device_state(name):
     result = get_state(name)
@@ -356,8 +380,32 @@ def lcd_rotation_loop():
         show_next_dht_on_lcd()
         time.sleep(4)
 
+def stopwatch_background_loop():
+    global stopwatch, blinking
+    while True:
+        if stopwatch > 0:
+            blinking = False
+            mqtt_client.publish("commands/4SD", json.dumps({"stopwatch": stopwatch}))
+            time.sleep(1)
+            stopwatch -= 1
+            
+            if stopwatch == 0:
+                blinking = True
+                
+        elif blinking:
+            mqtt_client.publish("commands/4SD", json.dumps({"blink": -1}))
+            time.sleep(1)
+            
+        else:
+            time.sleep(1)
+
 if __name__ == '__main__':
     lcd_thread = threading.Thread(target=lcd_rotation_loop)
     lcd_thread.daemon = True
     lcd_thread.start()
+
+    stopwatch_thread = threading.Thread(target=stopwatch_background_loop)
+    stopwatch_thread.daemon = True
+    stopwatch_thread.start()
+
     app.run(debug=False)
