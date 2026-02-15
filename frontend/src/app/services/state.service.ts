@@ -27,6 +27,10 @@ export class StateService {
         return this.http.post(`${this.apiUrl}/stopwatch`, { stopwatch: time })
     }
 
+    updateBRGB(mode: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/brgb`, { action: mode })
+    }
+
     getDeviceState(name: string): Observable<any> {
         return this.http.get(`${this.apiUrl}/state/${name}`);
     }

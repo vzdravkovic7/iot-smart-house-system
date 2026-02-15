@@ -7,6 +7,14 @@
     <input class="time" type="number" [(ngModel)]="stopwatch" placeholder="Enter time for Stopwatch">
     <button (click)="updateStopwatch()">Update</button>
 
+    <input class="time" type="number" [(ngModel)]="mode" placeholder="Enter BRGB Diode mode">
+    <button (click)="updateBRGB()">Update</button>
+
+    <!-- <h2>Live Camera Stream</h2> -->
+
+    <!-- <img src="http://localhost:8080/?action=stream" alt="Web Camera Stream"
+        style="width: 100%; height: auto; border: 2px solid black;"> -->
+
     <div *ngIf="loading">Loading...</div>
     <div *ngIf="error">Error loading state</div>
 

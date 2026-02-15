@@ -34,7 +34,7 @@ def ir_callback(code, publish_event, settings):
         "simulated": settings['simulated'],
         "runs_on": settings["runs_on"],
         "name": settings["name"],
-        "value": 1 if code else 0
+        "value": code
     }
 
     with counter_lock:
@@ -46,7 +46,7 @@ def ir_callback(code, publish_event, settings):
 
 def run_ir(settings, threads, stop_event):
         if settings['simulated']:
-            ir1_thread = threading.Thread(target = run_ir_simulator, args=(3, ir_callback, stop_event, publish_event, settings))
+            ir1_thread = threading.Thread(target = run_ir_simulator, args=(5, ir_callback, stop_event, publish_event, settings))
             ir1_thread.start()
             threads.append(ir1_thread)
         else:

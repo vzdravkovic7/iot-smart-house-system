@@ -26,6 +26,7 @@ export class DashboardComponent implements OnInit {
   ALARM = false;
   system_armed = false;
   stopwatch = '';
+  mode = '';
 
   constructor(private stateService: StateService) { }
 
@@ -68,6 +69,12 @@ export class DashboardComponent implements OnInit {
 
   updateStopwatch() {
     this.stateService.updateStopwatch(this.stopwatch).subscribe({
+      next: () => { }
+    })
+  }
+
+  updateBRGB() {
+    this.stateService.updateBRGB(this.mode).subscribe({
       next: () => { }
     })
   }

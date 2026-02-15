@@ -12,6 +12,7 @@ from actuators.buzzer import buzzer_on, buzzer_off
 from actuators.timer4sd import timer_set, timer_clear
 from components.web_camera import run_web_camera
 from actuators.lcd_simulated import *
+from actuators.brgb import *
 
 def console_menu():
     print("\n=== ACTUATOR CONTROL ===")

@@ -13,7 +13,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # InfluxDB Configuration
-token = "9j45ZmqnOGoSx4XKPadoMPyot0zsX0DwZg3FpvuaDpKDFIuBomlqMCYTyT_CdRiTBjtijnb9qJXw8-9XIrH9zg=="
+token = "WD4Q5MzZQNEri0gIvn-Zq8YPU45ddMzVRnyZ5DVuAbihnD8wFmdHud-2l5x0wbsl_PJ2QOybiHJHF0qyO7P3eQ=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "example_db"
@@ -88,6 +88,9 @@ def process_data(data):
         runs_on=data["runs_on"],
         simulated=data["simulated"]
     )
+
+    if data["name"] in ["Bedroom Infrared"]:
+        mqtt_client.publish("commands/BRGB", json.dumps({"action": data["value"]}))
 
     if data["name"] in ["Kitchen Button"] and data["value"] == 1:
         if blinking:
@@ -366,6 +369,12 @@ def updateStopwatch():
     global N
     N = int(request.json['stopwatch'])
     
+    return jsonify(True)
+
+@app.route("/api/brgb", methods=["POST"])
+def updateBRGB():
+    mode = int(request.json['action'])
+    mqtt_client.publish("commands/BRGB", json.dumps({"action": mode}))
     return jsonify(True)
 
 @app.route("/api/state/<name>", methods=["GET"])
