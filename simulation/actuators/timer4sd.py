@@ -8,7 +8,7 @@ from settings import load_settings
 
 batch = []
 publish_data_counter = 0
-publish_data_limit = 2
+publish_data_limit = 1
 counter_lock = threading.Lock()
 
 def publisher_task(event, batch):
@@ -28,7 +28,6 @@ publish_event = threading.Event()
 publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, batch,))
 publisher_thread.daemon = True
 publisher_thread.start()
-
 
 def timer_callback(value, settings):
     global publish_data_counter, publish_data_limit

@@ -4,7 +4,6 @@ import json
 import paho.mqtt.publish as publish
 from components.broker_settings import HOSTNAME, PORT
 
-# BATCH
 batch = []
 publish_data_counter = 0
 publish_data_limit = 1
@@ -21,12 +20,10 @@ def publisher_task(event, batch):
         publish.multiple(local_batch, hostname=HOSTNAME, port=PORT)
         event.clear()
 
-
 publish_event = threading.Event()
 publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, batch,))
 publisher_thread.daemon = True
 publisher_thread.start()
-
 
 def generic_button_callback(value, settings, publish_event):
     global publish_data_counter, publish_data_limit
@@ -45,7 +42,6 @@ def generic_button_callback(value, settings, publish_event):
 
     if publish_data_counter >= publish_data_limit:
         publish_event.set()
-
 
 def run_generic_button(settings, threads, stop_event):
     if settings['simulated']:

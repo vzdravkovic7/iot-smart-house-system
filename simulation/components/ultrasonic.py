@@ -21,11 +21,9 @@ def publisher_task(event, batch):
         event.clear()
 
 publish_event = threading.Event()
-
 publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, batch))
 publisher_thread.daemon = True
 publisher_thread.start()
-
 
 def ultrasonic_callback(distance, settings, publish_event):
     global publish_data_counter, publish_data_limit

@@ -1,7 +1,6 @@
 from simulators.gyro import run_gyro_simulator
 import threading
 import json
-import math
 import paho.mqtt.publish as publish
 from components.broker_settings import HOSTNAME, PORT
 
@@ -25,7 +24,6 @@ publish_event = threading.Event()
 publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, batch))
 publisher_thread.daemon = True
 publisher_thread.start()
-
 
 def gyro_callback(x, y, z, settings, publish_event):
     global publish_data_counter, publish_data_limit
@@ -69,4 +67,3 @@ def run_gyro(settings, threads, stop_event):
         threads.append(t)
     else:
         pass
-        # real gyro
