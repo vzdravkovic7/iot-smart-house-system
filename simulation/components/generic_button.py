@@ -53,6 +53,7 @@ def run_generic_button(settings, threads, stop_event):
         threads.append(t)
     else:
         pass
+        # from sensors.button import run_dht_loop, DHT
         # button = Button(settings['pin'])
         # t = threading.Thread(target=run_button_loop, args=(button, 0.2, button_callback, stop_event))
         # t.start()
