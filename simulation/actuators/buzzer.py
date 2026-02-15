@@ -7,7 +7,7 @@ from settings import load_settings
 
 batch = []
 publish_data_counter = 0
-publish_data_limit = 2
+publish_data_limit = 1
 counter_lock = threading.Lock()
 
 def publisher_task(event, batch):
@@ -25,7 +25,6 @@ publish_event = threading.Event()
 publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, batch,))
 publisher_thread.daemon = True
 publisher_thread.start()
-
 
 def buzzer_callback(value, settings):
     global publish_data_counter, publish_data_limit
@@ -45,11 +44,9 @@ def buzzer_callback(value, settings):
     if publish_data_counter >= publish_data_limit:
         publish_event.set()
 
-
 def buzzer_on(settings):
     print("[DB] Buzzer ACTIVATED")
     buzzer_callback(1, settings)
-
 
 def buzzer_off(settings):
     print("[DB] Buzzer DEACTIVATED")

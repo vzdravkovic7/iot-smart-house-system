@@ -52,4 +52,3 @@ def run_web_camera(settings, threads, stop_event):
         threads.append(t)
     else:
         pass
-        # realna implementacija
