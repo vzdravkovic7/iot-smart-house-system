@@ -1,39 +1,26 @@
-# import RPi.GPIO as GPIO
-# import time
+import RPi.GPIO as GPIO
+import time
 
-# class Button(object):
-#     BUTTON_OK = 0
-#     BUTTON_ERROR = -1
-    
-#     def __init__(self, pin):
-#         self.pin = pin
-#         self.state = False
-#         GPIO.setmode(GPIO.BCM)
-#         GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    
-#     def readButton(self):
-#         try:
-#             self.state = not GPIO.input(self.pin)
-#             return self.BUTTON_OK
-#         except Exception as e:
-#             print(f"Error reading button: {e}")
-#             return self.BUTTON_ERROR
-    
-#     def cleanup(self):
-#         GPIO.cleanup(self.pin)
+def run_button_loop(pin, callback, stop_event, settings):
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# def parseButtonCheckCode(code):
-#     if code == 0:
-#         return "BUTTON_OK"
-#     elif code == -1:
-#         return "BUTTON_ERROR"
+    def gpio_callback(channel):
+        value = GPIO.input(pin)
+        pressed = (value == GPIO.LOW)
 
-# def run_button_loop(button, delay, callback, stop_event):
-#     while True:
-#         check = button.readButton()
-#         code = parseButtonCheckCode(check)
-#         pressed = button.state
-#         callback(pressed, code)
-#         if stop_event.is_set():
-#             break
-#         time.sleep(delay)
+        if pressed:
+            callback(True, settings, None)
+
+    GPIO.add_event_detect(
+        pin,
+        GPIO.FALLING,
+        callback=gpio_callback,
+        bouncetime=200
+    )
+
+    try:
+        while not stop_event.is_set():
+            time.sleep(0.1)
+    finally:
+        GPIO.cleanup(pin)

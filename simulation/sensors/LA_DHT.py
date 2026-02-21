@@ -1,7 +1,6 @@
-
+#!/usr/bin/env python3
 import RPi.GPIO as GPIO
 import time
-GPIO.setmode(GPIO.BCM)
 
 class DHT(object):
 	DHTLIB_OK = 0
@@ -18,6 +17,7 @@ class DHT(object):
 	def __init__(self,pin):
 		self.pin = pin
 		self.bits = [0,0,0,0,0]
+		GPIO.setmode(GPIO.BCM)
 	#Read DHT sensor, store the original data in bits[]	
 	def readSensor(self,pin,wakeupDelay):
 		mask = 0x80
@@ -76,24 +76,27 @@ class DHT(object):
 		if(self.bits[4] is not sumChk):
 			return self.DHTLIB_ERROR_CHECKSUM
 		return self.DHTLIB_OK
-
-def parseCheckCode(code):
-	if code == 0:
-		return "DHTLIB_OK"
-	elif code == -1:
-		return "DHTLIB_ERROR_CHECKSUM"
-	elif code == -2:
-		return "DHTLIB_ERROR_TIMEOUT"
-	elif code == -999:
-		return "DHTLIB_INVALID_VALUE"
-
-
-def run_dht_loop(dht, delay, callback, stop_event, settings):
-		while True:
-			check = dht.readDHT11()
-			code = parseCheckCode(check)
-			humidity, temperature = dht.humidity, dht.temperature
-			callback(humidity, temperature, stop_event, settings)
-			if stop_event.is_set():
-					break
-			time.sleep(delay)  # Delay between readings
+		
+def loop():
+	dht = DHT(11)
+	sumCnt = 0
+	okCnt = 0
+	while(True):
+		sumCnt += 1
+		chk = dht.readDHT11()	
+		if (chk is 0):
+			okCnt += 1		
+		okRate = 100.0*okCnt/sumCnt;
+		print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt,okRate))
+		print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk,dht.humidity,dht.temperature))
+		time.sleep(3)		
+		
+if __name__ == '__main__':
+	print ('Program is starting ... ')
+	try:
+		loop()
+	except KeyboardInterrupt:
+		pass
+		exit()		
+		
+		

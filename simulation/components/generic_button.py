@@ -52,8 +52,12 @@ def run_generic_button(settings, threads, stop_event):
         t.start()
         threads.append(t)
     else:
-        pass
-        # button = Button(settings['pin'])
-        # t = threading.Thread(target=run_button_loop, args=(button, 0.2, button_callback, stop_event))
-        # t.start()
-        # threads.append(t)
+        from sensors.button import run_button_loop
+
+        t = threading.Thread(
+            target=run_button_loop,
+            args=(settings["pin"], generic_button_callback, stop_event, settings)
+        )
+        t.start()
+        threads.append(t)
+        

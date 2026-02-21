@@ -50,8 +50,8 @@ def run_pir(settings, diode_settings, threads, stop_event):
         t.start()
         threads.append(t)
     else:
-        pass
-        # pir = PIR(settings['pin'])
-        # t = threading.Thread(target=run_pir_loop, args=(pir, 0.5, pir_callback, stop_event))
-        # t.start()
-        # threads.append(t)
+        from sensors.pir import run_pir, PIR
+        pir = PIR(settings['pin'])
+        t = threading.Thread(target=run_pir, args=(pir, 0.5, pir_callback, stop_event, publish_event, settings, diode_settings))
+        t.start()
+        threads.append(t)

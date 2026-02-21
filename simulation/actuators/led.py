@@ -54,10 +54,30 @@ def led_off(settings):
 
 def on_command_received(client, userdata, msg):
     payload = json.loads(msg.payload.decode('utf-8'))
-    if payload.get("action") == "ON":
-        led_on(load_settings()["DL"])
-    if payload.get("action") == "OFF":
-        led_off(load_settings()["DL"])
+    settings = load_settings()["DL"]
+
+    action = payload.get("action")
+
+    if settings["simulated"]:
+        if action == "ON":
+            led_on(settings)
+        elif action == "OFF":
+            led_off(settings)
+    else:
+        from actuators.led_real import led_run
+
+        print("Starting real LED action")
+
+        t = threading.Thread(
+            target=led_run,
+            args=(action, settings["pin"])
+        )
+        t.start()
+
+        if action == "ON":
+            led_callback(1, settings)
+        elif action == "OFF":
+            led_callback(0, settings)
 
 cmd_client = mqtt.Client()
 cmd_client.on_message = on_command_received

@@ -26,26 +26,30 @@ def console_menu():
     print("q - Quit")
 
 if __name__ == "__main__":
+    CURRENT_PI = "PI2"
     print("Starting Smart House")
     settings = load_settings()
     threads = []
     stop_event = threading.Event()
 
     try:
-        run_ir(settings['IR'], threads, stop_event)
-        run_dht(settings['DHT1'], threads, stop_event)
-        run_dht(settings['DHT2'], threads, stop_event)
-        run_dht(settings["DHT3"], threads, stop_event)
-        run_generic_button(settings['BTN'], threads, stop_event)
-        run_generic_button(settings['DS1'], threads, stop_event)
-        run_generic_button(settings['DS2'], threads, stop_event)
-        run_pir(settings['DPIR1'], settings['DL'], threads, stop_event)
-        run_pir(settings["DPIR2"], settings['DL'], threads, stop_event)
-        run_pir(settings['DPIR3'], settings['DL'], threads, stop_event)
-        run_ultrasonic(settings['DUS1'], threads, stop_event)
-        run_ultrasonic(settings["DUS2"], threads, stop_event)
-        run_web_camera(settings["WEBC"], threads, stop_event)
-        run_gyro(settings["GSG"], threads, stop_event)
+        if CURRENT_PI == "PI1":
+            run_generic_button(settings['DS1'], threads, stop_event)
+            run_ultrasonic(settings['DUS1'], threads, stop_event)
+            run_pir(settings['DPIR1'], settings['DL'], threads, stop_event)
+            run_web_camera(settings["WEBC"], threads, stop_event)
+        elif CURRENT_PI == "PI2":
+            run_generic_button(settings['DS2'], threads, stop_event)
+            run_pir(settings["DPIR2"], settings['DL'], threads, stop_event)
+            run_ultrasonic(settings["DUS2"], threads, stop_event)
+            run_generic_button(settings['BTN'], threads, stop_event)
+            run_dht(settings["DHT3"], threads, stop_event)
+            run_gyro(settings["GSG"], threads, stop_event)
+        else:
+            run_ir(settings['IR'], threads, stop_event)
+            run_dht(settings['DHT1'], threads, stop_event)
+            run_dht(settings['DHT2'], threads, stop_event)
+            run_pir(settings['DPIR3'], settings['DL'], threads, stop_event)
 
         while True:
             console_menu()

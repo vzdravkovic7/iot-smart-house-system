@@ -54,10 +54,30 @@ def buzzer_off(settings):
 
 def on_command_received(client, userdata, msg):
     payload = json.loads(msg.payload.decode('utf-8'))
-    if payload.get("action") == True:
-        buzzer_on(load_settings()["DB"])
+    settings = load_settings()["DB"]
+
+    action = payload.get("action")
+
+    if settings["simulated"]:
+        if action:
+            buzzer_on(settings)
+        else:
+            buzzer_off(settings)
     else:
-        buzzer_off(load_settings()["DB"])
+        from actuators.buzzer_real import buzzer_run
+
+        print("Starting real buzzer")
+
+        t = threading.Thread(
+            target=buzzer_run,
+            args=(action, settings["pin"])
+        )
+        t.start()
+
+        if action:
+            buzzer_callback(1, settings)
+        else:
+            buzzer_callback(0, settings)
 
 cmd_client = mqtt.Client()
 cmd_client.on_message = on_command_received

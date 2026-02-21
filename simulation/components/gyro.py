@@ -66,4 +66,11 @@ def run_gyro(settings, threads, stop_event):
         t.start()
         threads.append(t)
     else:
-        pass
+        from sensors.gyro import run_gyro_loop
+
+        t = threading.Thread(
+            target=run_gyro_loop,
+            args=(1, gyro_callback, stop_event, settings)
+        )
+        t.start()
+        threads.append(t)

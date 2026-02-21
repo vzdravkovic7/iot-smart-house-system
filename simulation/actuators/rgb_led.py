@@ -1,78 +1,64 @@
 import RPi.GPIO as GPIO
-from time import sleep
 
-#disable warnings (optional)
 GPIO.setwarnings(False)
-
 GPIO.setmode(GPIO.BCM)
 
-RED_PIN = 12
-GREEN_PIN = 13
-BLUE_PIN = 19
 
-#set pins as outputs
-GPIO.setup(RED_PIN, GPIO.OUT)
-GPIO.setup(GREEN_PIN, GPIO.OUT)
-GPIO.setup(BLUE_PIN, GPIO.OUT)
+class RGBLed:
+    def __init__(self, red_pin, green_pin, blue_pin):
+        self.red = red_pin
+        self.green = green_pin
+        self.blue = blue_pin
 
-def turnOff():
-    GPIO.output(RED_PIN, GPIO.LOW)
-    GPIO.output(GREEN_PIN, GPIO.LOW)
-    GPIO.output(BLUE_PIN, GPIO.LOW)
-    
-def white():
-    GPIO.output(RED_PIN, GPIO.HIGH)
-    GPIO.output(GREEN_PIN, GPIO.HIGH)
-    GPIO.output(BLUE_PIN, GPIO.HIGH)
-    
-def red():
-    GPIO.output(RED_PIN, GPIO.HIGH)
-    GPIO.output(GREEN_PIN, GPIO.LOW)
-    GPIO.output(BLUE_PIN, GPIO.LOW)
+        GPIO.setup(self.red, GPIO.OUT)
+        GPIO.setup(self.green, GPIO.OUT)
+        GPIO.setup(self.blue, GPIO.OUT)
 
-def green():
-    GPIO.output(RED_PIN, GPIO.LOW)
-    GPIO.output(GREEN_PIN, GPIO.HIGH)
-    GPIO.output(BLUE_PIN, GPIO.LOW)
-    
-def blue():
-    GPIO.output(RED_PIN, GPIO.LOW)
-    GPIO.output(GREEN_PIN, GPIO.LOW)
-    GPIO.output(BLUE_PIN, GPIO.HIGH)
-    
-def yellow():
-    GPIO.output(RED_PIN, GPIO.HIGH)
-    GPIO.output(GREEN_PIN, GPIO.HIGH)
-    GPIO.output(BLUE_PIN, GPIO.LOW)
-    
-def purple():
-    GPIO.output(RED_PIN, GPIO.HIGH)
-    GPIO.output(GREEN_PIN, GPIO.LOW)
-    GPIO.output(BLUE_PIN, GPIO.HIGH)
-    
-def lightBlue():
-    GPIO.output(RED_PIN, GPIO.LOW)
-    GPIO.output(GREEN_PIN, GPIO.HIGH)
-    GPIO.output(BLUE_PIN, GPIO.HIGH)
+        self.turn_off()
 
-if __name__ == "__main__":
+    def turn_off(self):
+        GPIO.output(self.red, GPIO.LOW)
+        GPIO.output(self.green, GPIO.LOW)
+        GPIO.output(self.blue, GPIO.LOW)
+
+    def white(self):
+        GPIO.output(self.red, GPIO.HIGH)
+        GPIO.output(self.green, GPIO.HIGH)
+        GPIO.output(self.blue, GPIO.HIGH)
+
+    def red_light(self):
+        GPIO.output(self.red, GPIO.HIGH)
+        GPIO.output(self.green, GPIO.LOW)
+        GPIO.output(self.blue, GPIO.LOW)
+
+    def green_light(self):
+        GPIO.output(self.red, GPIO.LOW)
+        GPIO.output(self.green, GPIO.HIGH)
+        GPIO.output(self.blue, GPIO.LOW)
+
+    def blue_light(self):
+        GPIO.output(self.red, GPIO.LOW)
+        GPIO.output(self.green, GPIO.LOW)
+        GPIO.output(self.blue, GPIO.HIGH)
+
+
+def rgb_run(mode, settings):
+    led = RGBLed(
+        settings["red_pin"],
+        settings["green_pin"],
+        settings["blue_pin"]
+    )
+
     try:
-        while True:
-            turnOff()
-            sleep(1)
-            white()
-            sleep(1)
-            red()
-            sleep(1)
-            green()
-            sleep(1)
-            blue()
-            sleep(1)
-            yellow()
-            sleep(1)
-            purple()
-            sleep(1)
-            lightBlue()
-            sleep(1)
-    except KeyboardInterrupt:
-        GPIO.cleanup()
+        if mode == 0:
+            led.turn_off()
+        elif mode == 1:
+            led.white()
+        elif mode == 2:
+            led.red_light()
+        elif mode == 3:
+            led.green_light()
+        elif mode == 4:
+            led.blue_light()
+    except Exception as e:
+        print("RGB error:", e)

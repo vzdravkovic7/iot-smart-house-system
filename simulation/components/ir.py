@@ -6,7 +6,7 @@ from components.broker_settings import HOSTNAME, PORT
 
 batch = []
 publish_data_counter = 0
-publish_data_limit = 2
+publish_data_limit = 1
 counter_lock = threading.Lock()
 
 def publisher_task(event, batch):
@@ -50,10 +50,16 @@ def run_ir(settings, threads, stop_event):
             ir1_thread.start()
             threads.append(ir1_thread)
         else:
-            from sensors.ir import run_ir_loop, IR
+            from sensors.ir_receiver import run_ir_loop, IR
+
             print("Starting ir loop")
             ir = IR(settings['pin'])
-            ir1_thread = threading.Thread(target=run_ir_loop, args=(ir, 2, ir_callback, stop_event))
+
+            ir1_thread = threading.Thread(
+                target=run_ir_loop,
+                args=(ir, 0.1, ir_callback, stop_event, publish_event, settings)
+            )
+
             ir1_thread.start()
             threads.append(ir1_thread)
-            print("ir1 loop started")
+            print("ir loop started")

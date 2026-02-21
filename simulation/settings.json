@@ -4,81 +4,107 @@
         "name": "Door Sensor 1",
         "runs_on": "PI1",
         "simulated": true,
-        "topic": "sensors/button"
+        "topic": "sensors/button",
+        "pin": 17
     },
     "DPIR1": {
         "measurement": "PIR",
         "name": "Door Motion Sensor 1",
         "runs_on": "PI1",
         "simulated": true,
-        "topic": "sensors/pir"
+        "topic": "sensors/pir",
+        "pin": 17
     },
     "DUS1": {
         "measurement": "Ultrasonic",
         "name": "Door Ultrasonic Sensor 1",
         "runs_on": "PI1",
         "simulated": true,
-        "topic": "sensors/ultrasonic"
+        "topic": "sensors/uds",
+        "trigger_pin": 23,
+        "echo_pin": 24
     },
     "DMS": {
+        "measurement": "Membrane",
         "name": "Door Membrane Switch 1",
         "runs_on": "PI1",
         "simulated": true,
-        "topic": "sensors/membrane"
+        "topic": "actuators/membrane",
+        "rows": [
+            25,
+            8,
+            7,
+            1
+        ],
+        "cols": [
+            12,
+            16,
+            20,
+            21
+        ]
     },
     "DB": {
         "name": "Door Buzzer 1",
         "runs_on": "PI1",
         "simulated": true,
-        "topic": "actuators/buzzer"
+        "topic": "actuators/buzzer",
+        "pin": 17
     },
     "DL": {
         "name": "Door Light 1",
         "runs_on": "PI1",
         "simulated": true,
-        "topic": "actuators/led"
+        "topic": "actuators/led",
+        "pin": 18
     },
     "DHT1": {
         "name": "Bedroom DHT",
         "measurement": "DHT1",
         "runs_on": "PI3",
         "simulated": true,
-        "topic": "sensors/dht"
+        "topic": "sensors/dht",
+        "pin": 18
     },
     "DHT2": {
         "name": "Master Bedroom DHT",
         "measurement": "DHT2",
         "runs_on": "PI3",
         "simulated": true,
-        "topic": "sensors/dht"
+        "topic": "sensors/dht",
+        "pin": 18
     },
     "IR": {
         "name": "Bedroom Infrared",
         "measurement": "IR",
         "runs_on": "PI3",
         "simulated": true,
-        "topic": "sensors/ir"
+        "topic": "sensors/ir_reciever",
+        "pin": 17
     },
     "BRGB": {
         "name": "Bedroom RGB",
         "measurement": "BRGB",
         "runs_on": "PI3",
         "simulated": true,
-        "topic": "actuators/rgb"
+        "topic": "actuators/rgb",
+        "red_pin": 12,
+        "green_pin": 13,
+        "blue_pin": 19
     },
     "LCD": {
         "name": "Living room Display",
         "measurement": "LCD",
         "runs_on": "PI3",
         "simulated": true,
-        "topic": "actuators/lcd"
+        "topic": "actuators/lcd",
+        "pin": 18
     },
     "DPIR3": {
         "name": "Living Room Motion Sensor",
         "measurement": "DPIR3",
         "runs_on": "PI3",
         "simulated": true,
-        "topic": "actuators/pir"
+        "topic": "sensors/pir"
     },
     "4SD": {
         "name": "4-Digit 7-Segment Timer",
@@ -91,42 +117,47 @@
         "name": "Door Sensor 2",
         "runs_on": "PI2",
         "simulated": true,
-        "topic": "sensors/ds2"
+        "topic": "sensors/button",
+        "pin": 17
     },
     "BTN": {
         "measurement": "BTN",
         "name": "Kitchen Button",
         "runs_on": "PI2",
         "simulated": true,
-        "topic": "sensors/btn"
+        "topic": "sensors/button",
+        "pin": 17
     },
     "DPIR2": {
         "measurement": "PIR2",
         "name": "Door Motion Sensor 2",
         "runs_on": "PI2",
         "simulated": true,
-        "topic": "sensors/pir2"
+        "topic": "sensors/pir"
     },
     "DUS2": {
         "measurement": "Ultrasonic2",
         "name": "Door Ultrasonic Sensor 2",
         "runs_on": "PI2",
         "simulated": true,
-        "topic": "sensors/ultrasonic2"
+        "topic": "sensors/uds",
+        "trigger_pin": 23,
+        "echo_pin": 24
     },
     "DHT3": {
         "measurement": "DHT3",
         "name": "Kitchen DHT Sensor",
         "runs_on": "PI2",
         "simulated": true,
-        "topic": "sensors/dht3"
+        "topic": "sensors/dht",
+        "pin": 18
     },
     "GSG": {
         "measurement": "GSG",
         "name": "Gyroscope Sensor",
         "runs_on": "PI2",
         "simulated": true,
-        "topic": "sensors/gsg"
+        "topic": "sensors/gyro"
     },
     "WEBC": {
         "measurement": "WEBC",

@@ -53,8 +53,17 @@ def run_ultrasonic(settings, threads, stop_event):
         t.start()
         threads.append(t)
     else:
-        pass
-        # ultrasonic = Ultrasonic(settings['trigger_pin'], settings['echo_pin'])
-        # t = threading.Thread(target=run_ultrasonic_loop, args=(ultrasonic, 1.0, ultrasonic_callback, stop_event))
-        # t.start()
-        # threads.append(t)
+        from sensors.ultrasonic import Ultrasonic, run_ultrasonic_loop
+
+        ultrasonic = Ultrasonic(
+            settings['trigger_pin'],
+            settings['echo_pin']
+        )
+
+        t = threading.Thread(
+            target=run_ultrasonic_loop,
+            args=(ultrasonic, 1.0, ultrasonic_callback, stop_event, publish_event, settings)
+        )
+
+        t.start()
+        threads.append(t)
