@@ -14,6 +14,12 @@ from components.web_camera import run_web_camera
 from actuators.lcd_simulated import *
 from actuators.brgb import *
 
+try:
+    import RPi.GPIO as GPIO
+    GPIO.setmode(GPIO.BCM)
+except:
+    pass
+
 def console_menu():
     print("\n=== ACTUATOR CONTROL ===")
     print("1 - LED ON")
@@ -26,7 +32,7 @@ def console_menu():
     print("q - Quit")
 
 if __name__ == "__main__":
-    CURRENT_PI = "PI2"
+    CURRENT_PI = "PI1"
     print("Starting Smart House")
     settings = load_settings()
     threads = []
