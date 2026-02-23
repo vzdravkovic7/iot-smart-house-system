@@ -21,8 +21,8 @@
         "runs_on": "PI1",
         "simulated": true,
         "topic": "sensors/uds",
-        "trigger_pin": 23,
-        "echo_pin": 24
+        "trigger_pin": 18,
+        "echo_pin": 17
     },
     "DMS": {
         "measurement": "Membrane",
@@ -79,7 +79,7 @@
         "runs_on": "PI3",
         "simulated": true,
         "topic": "sensors/ir_reciever",
-        "pin": 17
+        "pin": 18
     },
     "BRGB": {
         "name": "Bedroom RGB",

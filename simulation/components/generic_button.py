@@ -56,7 +56,7 @@ def run_generic_button(settings, threads, stop_event):
 
         t = threading.Thread(
             target=run_button_loop,
-            args=(settings["pin"], generic_button_callback, stop_event, settings)
+            args=(settings["pin"], generic_button_callback, stop_event, publish_event, settings)
         )
         t.start()
         threads.append(t)

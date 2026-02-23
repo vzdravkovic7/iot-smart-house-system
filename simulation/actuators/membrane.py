@@ -39,6 +39,8 @@ def membrane_callback(pin, settings):
         "value": pin,
     }
 
+    print("pin:", pin)
+
     with counter_lock:
         batch.append((settings["measurement"], json.dumps(payload), 0, True))
         publish_data_counter += 1

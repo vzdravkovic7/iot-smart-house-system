@@ -10,10 +10,12 @@ class Keypad:
         self.rows = settings["rows"]
         self.cols = settings["cols"]
 
+        # Rows = OUTPUT
         for row in self.rows:
             GPIO.setup(row, GPIO.OUT)
             GPIO.output(row, GPIO.LOW)
 
+        # Cols = INPUT with PULL-DOWN
         for col in self.cols:
             GPIO.setup(col, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
@@ -30,8 +32,14 @@ class Keypad:
 
             for j, col in enumerate(self.cols):
                 if GPIO.input(col) == 1:
+                    key = self.keys[i][j]
+
+                    # čekaj otpust da ne duplira
+                    while GPIO.input(col) == 1:
+                        time.sleep(0.01)
+
                     GPIO.output(row, GPIO.LOW)
-                    return self.keys[i][j]
+                    return key
 
             GPIO.output(row, GPIO.LOW)
 
@@ -47,17 +55,20 @@ def keypad_run(settings, callback, stop_event):
             key = keypad.read_key()
 
             if key:
+                print("Pressed:", key)
+
                 if key.isdigit():
                     pin_buffer += key
-                    print("Pressed:", key)
 
+                # kada stignu 4 cifre
                 if len(pin_buffer) == 4:
+                    print("PIN entered:", pin_buffer)
                     callback(pin_buffer, settings)
                     pin_buffer = ""
 
-                time.sleep(0.3)  # debounce
+                time.sleep(0.2)  # debounce
 
             time.sleep(0.05)
 
-    except Exception as e:
-        print("Keypad error:", e)
+    finally:
+        GPIO.cleanup()

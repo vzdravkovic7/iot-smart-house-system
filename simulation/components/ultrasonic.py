@@ -53,7 +53,7 @@ def run_ultrasonic(settings, threads, stop_event):
         t.start()
         threads.append(t)
     else:
-        from sensors.ultrasonic import Ultrasonic, run_ultrasonic_loop
+        from sensors.uds import Ultrasonic, run_ultrasonic_loop
 
         ultrasonic = Ultrasonic(
             settings['trigger_pin'],
