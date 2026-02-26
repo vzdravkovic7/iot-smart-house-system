@@ -1,0 +1,212 @@
+<div class="dashboard-container" [class.alarm-active]="ALARM">
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1>🏠 Smart Home Security System</h1>
+            <div class="system-status">
+                <span class="status-badge" [class.armed]="system_armed" [class.disarmed]="!system_armed">
+                    {{ system_armed ? '🛡️ ARMED' : '🔓 DISARMED' }}
+                </span>
+                <span class="status-badge alarm" [class.active]="ALARM">
+                    {{ ALARM ? '🚨 ALARM ACTIVE' : '✓ SECURE' }}
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <section class="control-panel">
+        <h2>🎛️ Control Panel</h2>
+        <div class="controls-grid">
+            <div class="control-card">
+                <h3>Security System</h3>
+                <button class="btn" [class.btn-danger]="system_armed" [class.btn-success]="!system_armed"
+                    (click)="switchSystemArmed()">
+                    {{ system_armed ? '🔓 Disarm System' : '🛡️ Arm System' }}
+                </button>
+            </div>
+
+            <div class="control-card">
+                <h3>Alarm Override</h3>
+                <button class="btn" [class.btn-danger]="ALARM" [class.btn-secondary]="!ALARM" (click)="switchAlarm()">
+                    {{ ALARM ? '🔕 Deactivate Alarm' : '🚨 Activate Alarm' }}
+                </button>
+            </div>
+
+            <div class="control-card">
+                <h3>⏱️ Kitchen Timer</h3>
+                <div class="input-group">
+                    <input type="number" [(ngModel)]="stopwatch" placeholder="Time (seconds)" class="form-input"
+                        min="0">
+                    <button class="btn btn-primary" (click)="updateStopwatch()">Set Timer</button>
+                </div>
+            </div>
+
+            <div class="control-card">
+                <h3>💡 RGB Light Control</h3>
+                <div class="input-group">
+                    <input type="number" [(ngModel)]="mode" placeholder="Mode (0-4)" class="form-input" min="0" max="4">
+                    <button class="btn btn-primary" (click)="updateBRGB()">Change Mode</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="devices-section">
+        <h2>📡 Device Status</h2>
+
+        <div *ngIf="loading" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading device data...</p>
+        </div>
+
+        <div *ngIf="error" class="error-state">
+            <p>⚠️ Error loading device state. Please check connection.</p>
+        </div>
+
+        <div *ngIf="!loading && !error" class="devices-grid">
+            <div class="device-card" *ngFor="let dev of state | keyvalue" [class.simulated]="dev.value.simulated">
+                <div class="device-header">
+                    <h3>{{ formatDeviceName(dev.key) }}</h3>
+                    <span class="device-badge" [class.simulated]="dev.value.simulated">
+                        {{ dev.value.simulated ? ' Simulated' : ' Physical' }}
+                    </span>
+                </div>
+
+                <div class="device-details">
+                    <div class="detail-row">
+                        <span class="label">Value:</span>
+                        <span class="value primary">{{ formatValue(dev.value.value, dev.value.measurement) }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Type:</span>
+                        <span class="value">{{ dev.value.measurement }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Location:</span>
+                        <span class="value">{{ dev.value.runs_on }}</span>
+                    </div>
+                    <div class="detail-row timestamp">
+                        <span class="label">Last Update:</span>
+                        <span class="value">{{ formatTimestamp(dev.value.timestamp) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="monitoring-section">
+        <h2>📊 Live Monitoring (Grafana)</h2>
+        <div class="grafana-grid">
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&panelId=14&refresh=10s&__feature.dashboardSceneSolo=true"
+                    frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&panelId=1&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&panelId=2&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&panelId=3&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&panelId=4&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <!-- <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=5&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=6&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=13&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=8&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=15&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&panelId=10&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&panelId=7&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=9&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=11&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=12&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=16&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=17&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=18&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=19&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div>
+            <div class="grafana-panel">
+                <iframe
+                    src="http://localhost:3000/d-solo/ad87t69/smart-home-overview?orgId=1&from=now-1h&to=now&timezone=browser&refresh=10s&tab=queries&panelId=20&__feature.dashboardSceneSolo=true"
+                    width="450" height="200" frameborder="0"></iframe>
+            </div> -->
+        </div>
+    </section>
+
+    <!-- 
+  <section class="camera-section">
+    <h2>📹 Live Camera Feed</h2>
+    <div class="camera-container">
+      <img src="http://localhost:8080/?action=stream" alt="Web Camera Stream">
+    </div>
+  </section>
+  -->
+</div>
